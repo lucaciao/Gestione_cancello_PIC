@@ -3,62 +3,74 @@
 #include <timers.h>
 //--------------------------------------------------------------------------------------------
 //variabili globali
-int ContaTempo_ds;
-
+int Time_Open_Closed_Gate =0;
+int Time_Wait_Gait_To_Close=0:
 //prototipi
 void InterruptHandlerHigh (void);
 //--------------------------------------------------------------------------------------------
 //main
 void main (void)
 {
-    int stato = STATO_ATTESA_P1;
+    int state = CLOSED;
     //configura porte utilizzate (A,B)
     TRISA = PORTA_TRIS;
     PORTA = PORTA_DEFAULT;
-    
-    TRISB = PORTB_TRIS;
-    PORTB = PORTB_DEFAULT;
+
     
     //supponiamo un oscillatore a 4Mzh
-    //4.000.000 / 4= 1.000.000 /2 prescaler = 500.000
+    //4.000.000 / 4= 1.000.000 /16 prescaler = 62.500
     //configura TIMER0 (16 bit, interrupt enabled)
-    Opentimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_DEGE_FALL & T0_PS_1_2);
+    Opentimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_DEGE_FALL & T0_PS_1_2); //da cambiare
     WriteTimer0 (TIMER0_VALUE_100ms);
     while (1)
     {
-        switch (stato)
+        switch (state)
         {
-        case STATO_ATTESA_P1: //verifica se è stato premuto il pulsante 1
-            if (PULSANTE1 == 0)
-            {
-                USCITA = 1;
-                ContaTempo_ds = DURATA_IMPULSO1_ds;
-                stato = STATO_IMPULSO1;
+        case CLOSED:
+            if (OPEN_COMMAND == true) {
+
+                state = OPENING;
+                MOTOR_OPEN = true;
+                LIGHT= true;
             }
             break;
-        case STATO_IMPULSO1: //verifica se  esaurito il tempo per l'impulso 1
-            if (ContaTmpo_ds ==0)
-            {
-                USCITA = 0;
-                stato = STATO_ATTESAS_P2;
+
+        case OPENING:
+            if (OBSTACLE_DETECTED == true) {
+                state = WAIT;
+                LIGHT= true;
+                MOTOR_OPEN = false;
+                break; //CHIEDERE AL PROF
+            }
+            Time_Open_Closed_Gate++;
+            if (Time_Open_Closed_Gate = Max_Time_Open_Closed_Gate) {
+                Time_Open_Closed_Gate = 0;
+                state=OPEN_GATE;
             }
             break;
-        case STATO_ATTESA_P2://verifica se è stato premuto il pulsante 2
-            if (PULSANTE2 ==0)
-            {
-                USCITA = 1;
-                ContaTempo_ds = DURATA_IMPULSO2_ds;
-                stato = STATO_IMPULSO2;
+
+        case OPEN_GATE:
+            LIGHT= false;
+            MOTOR_OPEN = false;
+            Time_Wait_Gait_To_Close++;
+            if (Time_Wait_Gait_To_Close = MAX_TIME_WAIT_GATE_TO_CLOSE) {
+                Time_Wait_Gait_To_Close = 0;
+                state=CLOSING;
             }
             break;
-        case STATO_IMPULSO2://verifica se  esaurito il tempo per l'impulso 2
-            if (ContaTmpo_ds ==0)
-            {
-                USCITA = 0;
-                stato = STATO_ATTESAS_P1;
+        case OPENING:
+            if (OBSTACLE_DETECTED == true) {
+                state = WAIT;
+                LIGHT= true;
+                MOTOR_OPEN = false;
+                break; //CHIEDERE AL PROF
+             }
+            Time_Open_Closed_Gate++;
+            if (Time_Open_Closed_Gate = Max_Time_Open_Closed_Gate) {
+                Time_Open_Closed_Gate = 0;
+                state=OPEN_GATE;
             }
             break;
-        }
     }
 }
 
@@ -81,7 +93,7 @@ void InterruptVectorHigh ()
         WriteTimer0(TIMER0_VALUE_100ms);
         if (ContaTempo_ds > 0)
         {
-            ContaTempo_ds--;
+            Check_action=true;
         }
     }
 }

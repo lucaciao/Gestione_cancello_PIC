@@ -1,25 +1,29 @@
 #ifndef __TIMER_INTERRUPT
 #define __TIMER_INTERRUPT
 
-#define PULSANTE1 PORTAbits.RA0
-#define PULSANTE2 PORTAbits.RB0
-#define USCITA PORTAbits.RA4
+//input line
+#define OPEN_COMMAND PORTAbits.RA1
+#define OBSTACLE_DETECTED PORTAbits.RA2
 
-#define PORTA_TRIS 0b11101111
+//output line
+#define LIGHT PORTAbits.RA3
+#define MOTOR_OPEN PORTAbits.RA4
+#define MOTOR_CLOSE PORTAbits.RA5
+
+#define PORTA_TRIS 0b11000000
 #define PORTA_DEFAULT 0b00000000
 
-#define PORTB_TRIS 0b11111111
-#define PORTA_DEFAULT 0b00000000
+#define CLOSED 0
+#define OPENING 1
+#define OPEN_GATE 2
+#define CLOSING 3
+#define CLOSED_GATE 4
+#define WAIT 5
 
-#define STATO_ATTESA_P1 0
-#define  STATO_IMPULSO1 1
-#define STATO_ATTESA_P2 2
-#define  STATO_IMPULSO2 3
+#define Max_Time_Open_Closed_Gate 10
+#define MAX_TIME_WAIT_GATE_TO_CLOSE 30
 
-#define DURATA_IMPULSO1_ds 30
-#define DURATA_IMPULSO2_ds 50
-
-#define TIMER0_VALUE_100ms 15535
+#define START_VALUE_TIMER 3.035
 
 
 #endif
