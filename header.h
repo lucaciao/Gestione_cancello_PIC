@@ -17,10 +17,9 @@
 #define OPENING 1
 #define OPEN_GATE 2
 #define CLOSING 3
-#define CLOSED_GATE 4
-#define WAIT 5
+#define WAIT 4
 
-#define Max_Time_Open_Closed_Gate 10
+#define MAX_TIME_OPEN_CLOSED_GATE 10
 #define MAX_TIME_WAIT_GATE_TO_CLOSE 30
 
 #define START_VALUE_TIMER 3.035

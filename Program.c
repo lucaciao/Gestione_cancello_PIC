@@ -3,8 +3,9 @@
 #include <timers.h>
 //--------------------------------------------------------------------------------------------
 //variabili globali
+bool Check_action=true;
 int Time_Open_Closed_Gate =0;
-int Time_Wait_Gait_To_Close=0:
+int Time_Wait_Gate_To_Close=0;
 //prototipi
 void InterruptHandlerHigh (void);
 //--------------------------------------------------------------------------------------------
@@ -20,30 +21,23 @@ void main (void)
     //supponiamo un oscillatore a 4Mzh
     //4.000.000 / 4= 1.000.000 /16 prescaler = 62.500
     //configura TIMER0 (16 bit, interrupt enabled)
-    Opentimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_DEGE_FALL & T0_PS_1_2); //da cambiare
-    WriteTimer0 (TIMER0_VALUE_100ms);
-    while (1)
+    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_EDGE_FALL & T0_PS_1_2); //da cambiare
+    WriteTimer0 (START_VALUE_TIMER);
+    while (Check_action)
     {
         switch (state)
         {
         case CLOSED:
             if (OPEN_COMMAND == true) {
-
                 state = OPENING;
-                MOTOR_OPEN = true;
-                LIGHT= true;
             }
             break;
 
         case OPENING:
-            if (OBSTACLE_DETECTED == true) {
-                state = WAIT;
-                LIGHT= true;
-                MOTOR_OPEN = false;
-                break; //CHIEDERE AL PROF
-            }
+            LIGHT= true;
+            MOTOR_OPEN = true;
             Time_Open_Closed_Gate++;
-            if (Time_Open_Closed_Gate = Max_Time_Open_Closed_Gate) {
+            if (Time_Open_Closed_Gate == MAX_TIME_OPEN_CLOSED_GATE) {
                 Time_Open_Closed_Gate = 0;
                 state=OPEN_GATE;
             }
@@ -52,26 +46,34 @@ void main (void)
         case OPEN_GATE:
             LIGHT= false;
             MOTOR_OPEN = false;
-            Time_Wait_Gait_To_Close++;
-            if (Time_Wait_Gait_To_Close = MAX_TIME_WAIT_GATE_TO_CLOSE) {
-                Time_Wait_Gait_To_Close = 0;
+            Time_Wait_Gate_To_Close++;
+            if (Time_Wait_Gate_To_Close == MAX_TIME_WAIT_GATE_TO_CLOSE) {
+                Time_Wait_Gate_To_Close = 0;
                 state=CLOSING;
             }
             break;
-        case OPENING:
+        case CLOSING:
+            LIGHT= true;
+            MOTOR_CLOSE = true;
             if (OBSTACLE_DETECTED == true) {
                 state = WAIT;
-                LIGHT= true;
-                MOTOR_OPEN = false;
                 break; //CHIEDERE AL PROF
              }
             Time_Open_Closed_Gate++;
-            if (Time_Open_Closed_Gate = Max_Time_Open_Closed_Gate) {
+            if (Time_Open_Closed_Gate == MAX_TIME_OPEN_CLOSED_GATE) {
                 Time_Open_Closed_Gate = 0;
-                state=OPEN_GATE;
+                state=CLOSED;
             }
             break;
+        case WAIT:
+            LIGHT=true;
+            MOTOR_CLOSE=false;
+            if (OBSTACLE_DETECTED == false) {
+                state = OPENING;
+            }
+        break;
     }
+    Check_action=false;
 }
 
 #pragma code InterruptVectorHigh = 0x08
@@ -85,15 +87,13 @@ void InterruptVectorHigh (void)
 #pragma code
 #pragma interrupt InterruptVectorHigh
 
+
 void InterruptVectorHigh ()
 {
     if (INTCONbits.TMR0IF)
     {
         INTCONbits.TMR0IF=0;
-        WriteTimer0(TIMER0_VALUE_100ms);
-        if (ContaTempo_ds > 0)
-        {
-            Check_action=true;
-        }
+        WriteTimer0(START_VALUE_TIMER);
+        Check_action=true;
     }
 }
