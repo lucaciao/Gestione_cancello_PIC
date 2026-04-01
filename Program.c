@@ -19,9 +19,9 @@ void main (void)
 
     
     //supponiamo un oscillatore a 4Mzh
-    //4.000.000 / 4= 1.000.000 /16 prescaler = 62.500
+    //4.000.000 / 4= 1.000.000 no prescaler = 50.000 50ms interrupt
     //configura TIMER0 (16 bit, interrupt enabled)
-    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_PS_1_16); //da cambiare
+    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_PS_1_16);
     WriteTimer0 (START_VALUE_TIMER);
     
     while (Check_action)
@@ -29,6 +29,8 @@ void main (void)
         switch (state)
         {
         case CLOSED:
+            LIGHT= false;
+            MOTOR_CLOSE = false;
             if (OPEN_COMMAND == true) {
                 state = OPENING;
             }

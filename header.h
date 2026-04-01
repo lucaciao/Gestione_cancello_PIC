@@ -1,5 +1,5 @@
-#ifndef __TIMER_INTERRUPT
-#define __TIMER_INTERRUPT
+#ifndef __GATE_CONTROL
+#define __GATE_CONTROL
 
 //input line
 #define OPEN_COMMAND PORTAbits.RA1
@@ -19,10 +19,10 @@
 #define CLOSING 3
 #define OBSTACLE 4
 
-#define MAX_TIME_OPEN_CLOSED_GATE 10
-#define MAX_TIME_WAIT_GATE_TO_CLOSE 30
+#define MAX_TIME_OPEN_CLOSED_GATE 200
+#define MAX_TIME_WAIT_GATE_TO_CLOSE 600
 
-#define START_VALUE_TIMER 3035
+#define START_VALUE_TIMER 15535
 
 
 #endif
