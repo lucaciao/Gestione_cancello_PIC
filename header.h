@@ -17,12 +17,12 @@
 #define OPENING 1
 #define OPEN_GATE 2
 #define CLOSING 3
-#define WAIT 4
+#define OBSTACLE 4
 
 #define MAX_TIME_OPEN_CLOSED_GATE 10
 #define MAX_TIME_WAIT_GATE_TO_CLOSE 30
 
-#define START_VALUE_TIMER 3.035
+#define START_VALUE_TIMER 3035
 
 
 #endif

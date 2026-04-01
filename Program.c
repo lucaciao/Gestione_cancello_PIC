@@ -3,7 +3,7 @@
 #include <timers.h>
 //--------------------------------------------------------------------------------------------
 //variabili globali
-bool Check_action=true;
+bool volatile Check_action=true;
 int Time_Open_Closed_Gate =0;
 int Time_Wait_Gate_To_Close=0;
 //prototipi
@@ -21,8 +21,9 @@ void main (void)
     //supponiamo un oscillatore a 4Mzh
     //4.000.000 / 4= 1.000.000 /16 prescaler = 62.500
     //configura TIMER0 (16 bit, interrupt enabled)
-    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_EDGE_FALL & T0_PS_1_2); //da cambiare
+    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_EDGE_FALL & T0_PS_1_16); //da cambiare
     WriteTimer0 (START_VALUE_TIMER);
+    
     while (Check_action)
     {
         switch (state)
@@ -59,13 +60,17 @@ void main (void)
                 state = WAIT;
                 break; //CHIEDERE AL PROF
              }
+            if (OPEN_COMMAND == true) {
+                state = OPENING;
+                break; //CHIEDERE AL PROF
+            }
             Time_Open_Closed_Gate++;
             if (Time_Open_Closed_Gate == MAX_TIME_OPEN_CLOSED_GATE) {
                 Time_Open_Closed_Gate = 0;
                 state=CLOSED;
             }
             break;
-        case WAIT:
+        case OBSTACLE:
             LIGHT=true;
             MOTOR_CLOSE=false;
             if (OBSTACLE_DETECTED == false) {
@@ -80,7 +85,7 @@ void main (void)
 void InterruptVectorHigh (void)
 {
     _asm
-    goto InterruptVectorHigh
+        goto InterruptVectorHigh
     _endasm
 }
 
