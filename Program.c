@@ -21,7 +21,7 @@ void main (void)
     //supponiamo un oscillatore a 4Mzh
     //4.000.000 / 4= 1.000.000 /16 prescaler = 62.500
     //configura TIMER0 (16 bit, interrupt enabled)
-    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_EDGE_FALL & T0_PS_1_16); //da cambiare
+    OpenTimer0 (TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_PS_1_16); //da cambiare
     WriteTimer0 (START_VALUE_TIMER);
     
     while (Check_action)
@@ -57,7 +57,7 @@ void main (void)
             LIGHT= true;
             MOTOR_CLOSE = true;
             if (OBSTACLE_DETECTED == true) {
-                state = WAIT;
+                state = OBSTACOLE;
                 break; //CHIEDERE AL PROF
              }
             if (OPEN_COMMAND == true) {
@@ -85,7 +85,7 @@ void main (void)
 void InterruptVectorHigh (void)
 {
     _asm
-        goto InterruptVectorHigh
+        goto InterruptHandlerHigh
     _endasm
 }
 
@@ -93,7 +93,7 @@ void InterruptVectorHigh (void)
 #pragma interrupt InterruptVectorHigh
 
 
-void InterruptVectorHigh ()
+void InterruptHandlerHigh ()
 {
     if (INTCONbits.TMR0IF)
     {
